@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const moment = require('moment-timezone');
 const fs = require('fs');
 const path = require('path');
+const { getCredentialsPath } = require('../../utility/pathUtils');
 
 // Define the folder path for saving the .xlsx files
 const reportsFolderPath = path.join(__dirname, 'reports');
@@ -76,7 +77,7 @@ async function fetchGoogleSheetsData(sheetID, reference) {
         try {
             // Initialize the authentication client
             const auth = new google.auth.GoogleAuth({
-                keyFile: "./credentials.json",
+                keyFile: getCredentialsPath(),
                 scopes: ["https://www.googleapis.com/auth/spreadsheets"],
             });
 

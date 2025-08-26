@@ -4,6 +4,7 @@ const xlsx = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require("nodemailer");
+const { getCredentialsPath } = require('../../utility/pathUtils');
 
 let accountList = [
     {
@@ -49,7 +50,7 @@ function delay(milliseconds) {
 const accessGoogleSheet = async () => {
     // Initialize the authentication client
     const auth = new google.auth.GoogleAuth({
-        keyFile: "./credentials.json",
+        keyFile: getCredentialsPath(),
         scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
