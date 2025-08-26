@@ -130,12 +130,12 @@ dist
 # reports folder
 src/mpdu/mpdu_43vertical_month_end_report/reports
 src/mpdu/mpdu_43vertical_complaint_report/reports
-src/tabs/reports
+src/tabs/tabs_complaint_report/reports
 
 # logs folder
 src/mpdu/mpdu_43vertical_month_end_report/logs
 src/mpdu/mpdu_43vertical_complaint_report/logs
-src/tabs/logs
+src/tabs/tabs_complaint_report/logs
 
 # credentials file
 credentials.json
