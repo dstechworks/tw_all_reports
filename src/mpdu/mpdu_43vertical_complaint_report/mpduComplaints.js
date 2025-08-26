@@ -220,9 +220,9 @@ async function sendEmail(fileName) {
     try {
         const mailOptions = {
             from: fromEmail,
-            to: 'hitesh.kumar@techworks.co.in',
-            // to: 'mark.thomas.k@gmail.com, rohanwork2002@gmail.com',
-            // cc: 'dhruv@techworks.co.in, rusum@techworks.co.in, sandip@techworks.co.in, bharti.singh@techworks.co.in, pratik@techworks.co.in, hitesh.kumar@techworks.co.in',
+            // to: 'hitesh.kumar@techworks.co.in',
+            to: 'mark.thomas.k@gmail.com, rohanwork2002@gmail.com',
+            cc: 'dhruv@techworks.co.in, rusum@techworks.co.in, sandip@techworks.co.in, bharti.singh@techworks.co.in, pratik@techworks.co.in, hitesh.kumar@techworks.co.in',
             subject: `MPDU Complaints Tracker - ${currentFormattedDate}`,
             html: `<h6>Please find MPDU Complaints Tracker Report.</h6>
             <p>&nbsp;</p>

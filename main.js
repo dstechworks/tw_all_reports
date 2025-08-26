@@ -46,7 +46,7 @@ cron.schedule('0 12 28-31 * *', () => {
 }, { timezone: TIMEZONE });
 
 // Run a script manually if i want to runscript manually without using cron
-runScript('MPDU Complaints', 'src/mpdu/mpdu_43vertical_complaint_report/mpduComplaints.js');
+// runScript('MPDU Complaints', 'src/mpdu/mpdu_43vertical_complaint_report/mpduComplaints.js');
 // runScript('Tab Complaints', 'src/tabs/tabComplaints.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/mpdu.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/43vertical.js');
