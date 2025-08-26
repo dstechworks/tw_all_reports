@@ -45,3 +45,6 @@ cron.schedule('0 12 L * *', () => {
 // runScript('Tab Complaints', 'src/tabs/tabComplaints.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/mpdu.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/43vertical.js');
+// testing command : npm run dev
+// cron job command : node main.js
+// production command : npm run prod
