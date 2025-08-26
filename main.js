@@ -36,8 +36,13 @@ cron.schedule('0 12 15 * *', () => {
     runScript('Tab Complaints', 'src/tabs/tabComplaints.js'); // 15th day of month at 12 PM
 }, { timezone: TIMEZONE });
 
-cron.schedule('0 12 L * *', () => {
-    runScript('Tab Complaints', 'src/tabs/tabComplaints.js'); // Last day of month at 12 PM
+// Last day of month @ 12:00 PM: Run Tab Complaints
+cron.schedule('0 12 28-31 * *', () => {
+    const now = moment().tz(TIMEZONE);
+    const lastDayOfMonth = now.endOf('month').date();
+    if (now.date() === lastDayOfMonth) {
+        runScript('Tab Complaints', 'src/tabs/tabComplaints.js'); // Last day of month at 12 PM
+    }
 }, { timezone: TIMEZONE });
 
 // Run a script manually if i want to runscript manually without using cron
