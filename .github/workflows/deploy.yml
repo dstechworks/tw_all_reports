@@ -18,8 +18,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 165.22.218.65 >> ~/.ssh/known_hosts  # 🔁 Replace IP
+          ssh-keyscan -H 143.110.188.148 >> ~/.ssh/known_hosts  # 🔁 Replace IP
 
       - name: Run Deploy Script on Server
         run: |
-          ssh root@165.22.218.65 'bash -s' < ./deploy.sh  # 🔁 Replace user, IP, and script path
+          ssh root@143.110.188.148 'bash -s' < ./deploy.sh  # 🔁 Replace user, IP, and script path

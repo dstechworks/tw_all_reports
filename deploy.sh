@@ -2,7 +2,7 @@
 
 echo "===== DEPLOY STARTED at $(date) =====" >> /tmp/deploy.log
 
-cd ~/tata_wa_scripts || {
+cd ~/tw_all_reports || {
   echo "❌ ERROR: Could not cd into project folder" >> /tmp/deploy.log
   exit 1
 }
@@ -31,6 +31,6 @@ npm install >> /tmp/deploy.log 2>&1
 
 # Start the app in background
 echo "Starting new Node.js process..." >> /tmp/deploy.log
-nohup node ~/tata_wa_scripts/main.js >> /tmp/app-output.log 2>&1 &
+nohup node ~/tw_all_reports/main.js >> /tmp/app-output.log 2>&1 &
 
 echo "===== DEPLOY COMPLETED at $(date) =====" >> /tmp/deploy.log
