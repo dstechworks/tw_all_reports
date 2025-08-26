@@ -50,6 +50,3 @@ cron.schedule('0 12 28-31 * *', () => {
 // runScript('Tab Complaints', 'src/tabs/tabComplaints.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/mpdu.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/43vertical.js');
-
-
-
