@@ -11,13 +11,6 @@ cd ~/tw_all_reports || {
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Stop existing Node.js process running main.js (if any)
-echo "Stopping old Node.js process (main.js)..." >> /tmp/deploy.log
-pkill -f "node.*main.js" >> /tmp/deploy.log 2>&1
-
-# Wait a bit to ensure process is stopped
-sleep 2
-
 # Pull latest code
 echo "Pulling code from origin/production..." >> /tmp/deploy.log
 git pull origin production >> /tmp/deploy.log 2>&1
@@ -29,8 +22,10 @@ rm -rf node_modules >> /tmp/deploy.log 2>&1
 echo "Installing dependencies..." >> /tmp/deploy.log
 npm install >> /tmp/deploy.log 2>&1
 
-# Start the app in background
-echo "Starting new Node.js process..." >> /tmp/deploy.log
-nohup node ~/tw_all_reports/main.js >> /tmp/app-output.log 2>&1 &
+# Restart the app with PM2 (process ID 7)
+echo "Restarting app with PM2 (ID 7)..." >> /tmp/deploy.log
+pm2 stop 7 >> /tmp/deploy.log 2>&1
+pm2 restart 7 >> /tmp/deploy.log 2>&1
+pm2 save >> /tmp/deploy.log 2>&1
 
 echo "===== DEPLOY COMPLETED at $(date) =====" >> /tmp/deploy.log
