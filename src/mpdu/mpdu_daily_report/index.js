@@ -1,0 +1,1152 @@
+const nodemailer = require("nodemailer");
+const { google } = require('googleapis');
+const { Pool } = require('pg');
+const XLSX = require('xlsx');
+const path = require('path');
+
+const CONSTANTS = require("./constants");
+
+let accountList = [
+    {
+        "user": "pratik@techworks.co.in",
+        "pass": "Ew^KvQkh"
+    },
+    {
+        "user": "Bharti.singh@techworks.co.in",
+        "pass": "gymruc-saKpu8-purnoc"
+    },
+    {
+        "user": "Rusum@techworks.co.in",
+        "pass": "E$4aFt6wEm36#AaK"
+    },
+    {
+        "user": "hitesh.kumar@techworks.co.in",
+        "pass": "4VqvS&RY*ZFnqaU1"
+    },
+]
+
+const transporter1 = nodemailer.createTransport({
+    host: "smtp.dreamhost.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: accountList[0].user,
+        pass: accountList[0].pass
+    }
+});
+
+const transporter2 = nodemailer.createTransport({
+    host: "smtp.dreamhost.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: accountList[1].user,
+        pass: accountList[1].pass
+    }
+});
+
+const transporter3 = nodemailer.createTransport({
+    host: "smtp.dreamhost.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: accountList[2].user,
+        pass: accountList[2].pass
+    }
+});
+
+const transporter4 = nodemailer.createTransport({
+    host: "smtp.dreamhost.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: accountList[3].user,
+        pass: accountList[3].pass
+    }
+});
+
+const pool = new Pool({
+    user: "postgres",
+    host: 'db.mgampbhmlnalxohuobpr.supabase.co',
+    database: "postgres",
+    password: 'gplVhDuxLDMeBKxs',
+    port: 5432,
+});
+
+
+// GOOGLE API VARIABLES
+const spreadsheetId = "17ADQ1OvzA2KhHe1TG5eoCdFDqkHFiumuwIdy9jQ3s2M";
+let workbookData = {};
+
+const workbook = XLSX.utils.book_new();
+const workbooks = {};
+
+let response1;
+let response2;
+
+// Define allowed branches
+const ALLOWED_BRANCHES = [
+    'ECAL', 'EGAU', 'EORI', 'EVIZ', 'NCHA',
+    'NDEL', 'NEUP', 'NJPR', 'NLUC', 'NSAH',
+    'SBLR', 'SCHE', 'SCOI', 'SERN', 'SHYD',
+    'SKAR', 'WBHO', 'WMUM', 'WNAG', 'WPUN',
+    'WAHM'
+]
+
+// Email configurations for different branches
+const EMAIL_CONFIG = {
+    // transporter1 list
+    'DEFAULT': {
+        to: "mark.thomas.k@gmail.com, rohanwork2002@gmail.com, shayan.p.sadique@gmail.com",
+        cc: "dhruv@techworks.co.in, sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in, hitesh.kumar@techworks.co.in",
+        subject: "MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 8
+    },
+    'ECAL': {
+        to: "Rajdeep.Datta@itc.in, Dipannita.Tiwary@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "ECAL MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 8
+    },
+    'EGAU': {
+        to: "Sudipta.Gogoi@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "EGAU MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 7
+    },
+    'EORI': {
+        to: "Bibek.Swain@itc.in,DeepakKumar.Swain@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "EORI MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 7
+    },
+    'EVIZ': {
+        to: "Mubhashira.Mohammad@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "EVIZ MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 7
+    },
+    'NCHA': {
+        to: "v.bhardwaj@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NCHA MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 7
+    },
+    'NDEL': {
+        to: "Amit.Srivastava@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NDEL MPDU REPORT TILL",
+        transporterName: "transporter1",
+        emailCount: 7
+    },
+
+    // transporter2 list
+    'NEUP': {
+        to: "Laksh.Sethi@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NEUP MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 7
+    },
+    'NJPR': {
+        to: "Himanshu.Tanwar@itc.in, AkshatSingh.Ranavat@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NJPR MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 8
+    },
+    'NLUC': {
+        to: "Kumari.Nandini@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NLUC MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 7
+    },
+    'NSAH': {
+        to: "Birjesh.Gautam@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "NSAH MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 7
+    },
+    'SBLR': {
+        to: "Shreyas.K@itc.in, MohammedYahya.Zaid@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SBLR MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 7
+    },
+    'SCHE': {
+        to: "Sanjay.Kannan@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SCHE MPDU REPORT TILL",
+        transporterName: "transporter2",
+        emailCount: 7
+    },
+
+    // transporter3 list
+    'SCOI': {
+        to: "Gopinath.R@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SCOI MPDU REPORT TILL",
+        transporterName: "transporter3",
+        emailCount: 7
+    },
+    'SERN': {
+        to: "Ravisankar.KR@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SERN MPDU REPORT TILL",
+        transporterName: "transporter3",
+        emailCount: 7
+    },
+    'SHYD': {
+        to: "kolluri.durgasujanchandra@itc.in, Surkanti.Niranjan@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SHYD MPDU REPORT TILL",
+        transporterName: "transporter3",
+        emailCount: 8
+    },
+    'SKAR': {
+        to: "Sudhir.Shetty@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "SKAR MPDU REPORT TILL",
+        transporterName: "transporter3",
+        emailCount: 7
+    },
+    'WBHO': {
+        to: "Ashutosh.Dwivedi@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "WBHO MPDU REPORT TILL",
+        transporterName: "transporter3",
+        emailCount: 7
+    },
+
+    // transporter4 list
+    'WAHM': {
+        to: "archish.chauhan@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "WAHM MPDU REPORT TILL",
+        transporterName: "transporter4",
+        emailCount: 7
+    },
+    'WMUM': {
+        to: "Bibhu.Priyadarshi@itc.in, Mohammed.Glasswala@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "WMUM MPDU REPORT TILL",
+        transporterName: "transporter4",
+        emailCount: 8
+    },
+    'WNAG': {
+        to: "Ankush.Rathod@itc.in, Kishor.Sahare@itc.in",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "WNAG MPDU REPORT TILL",
+        transporterName: "transporter4",
+        emailCount: 8
+    },
+    'WPUN': {
+        to: "kritika.mahajan@itc.in, Danish.Sayyed@ITC.IN",
+        cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
+        subject: "WPUN MPDU REPORT TILL",
+        transporterName: "transporter4",
+        emailCount: 8
+    }
+};
+
+
+async function getDataFromGoogleSheets(sheetID, reference) {
+    const accessGoogleSheet = async () => {
+        try {
+            // Initialize the authentication client
+            const auth = new google.auth.GoogleAuth({
+                keyFile: "/root/mpdu-daily-report/credentials.json",
+                scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+            });
+
+            // Get the authenticated client
+            const authClientObject = await auth.getClient();
+
+            // Create the Sheets instance
+            const sheets = google.sheets({ version: 'v4', auth: authClientObject });
+
+            return sheets; // Return the sheets instance
+        } catch (error) {
+            console.error("Error initializing Google Sheets API:", error);
+            throw error;
+        }
+    };
+
+    const getAllWorkbookNames = async (sheets) => {
+        try {
+            // Get workbook names present in the spreadsheet
+            const response = await sheets.spreadsheets.get({
+                spreadsheetId: sheetID,
+            });
+
+            const sheetNames = response.data.sheets.map(sheet => sheet.properties.title);
+            // console.log('\n');
+            // console.log('Sheet Names:', sheetNames);
+
+            return sheetNames; // Return the sheet names
+        } catch (error) {
+            console.error("Error fetching workbook names:", error);
+            throw error;
+        }
+    };
+
+    const getWorkbookWiseData = async (sheets, sheetNames) => {
+        try {
+            for (let i = 0; i < sheetNames.length; i++) {
+                const sheetName = sheetNames[i];
+                // Fetch data for each sheet
+                const response = await sheets.spreadsheets.values.get({
+                    spreadsheetId: sheetID,
+                    range: sheetName,
+                });
+
+                const data = response.data.values || [];
+                // console.log(`Data for ${sheetName}:`, data.length);
+
+                // Change array of array data to array of objects like API response
+                const [headers, ...rows] = data;
+                let result = rows.map(row => Object.fromEntries(headers.map((key, index) => [key, row[index]])));
+                result = result.filter(i => i['Current Status'] == 'Verified & Currently Installed' && i['Branch Code']);
+                workbookData[sheetName] = result;
+            }
+        } catch (error) {
+            console.error("Error fetching data for sheets:", error);
+            throw error;
+        }
+
+        return true;
+    };
+
+    try {
+        let sheets = await accessGoogleSheet();
+        let sheetNames = await getAllWorkbookNames(sheets);
+        let getWorkbookRes = await getWorkbookWiseData(sheets, ['All Device']);
+        return getWorkbookRes;
+    } catch (error) {
+        console.error("Error during Google Sheets data retrieval:", error);
+    }
+}
+
+async function querydb() {
+    console.log("\n");
+    console.log("===============================================");
+    console.log(`             DATE :-  ${current_date}          `);
+    console.log("===============================================");
+    let getMpduBaseSheetData = await getDataFromGoogleSheets(spreadsheetId, 'BaseSheetCall');
+    console.log("MPDU BASE DATA SHEET ::", workbookData['All Device'].length);
+
+    if (getMpduBaseSheetData) {
+        response1 = (await pool.query(`select * from display_data_table where custom_date = '${current_date}'`)).rows;
+        response2 = (await pool.query(`select * from display_data_table where custom_date >= '${firstDate}' and custom_date <= '${current_date}'`)).rows;
+
+        console.log("Data From display_data_table ::", response1.length, response2.length);
+    }
+}
+
+function common(name, dataArray) {
+    // Skip the header row (index 0) and total row (last row)
+    for (let i = 1; i < dataArray.length - 1; i++) {
+        const branchCode = dataArray[i][0];  // Branch code is the first column
+
+        // Only process if it's in our allowed branches list
+        if (ALLOWED_BRANCHES.includes(branchCode)) {
+            // Create a new workbook for this branch if it doesn't exist
+            if (!workbooks[branchCode]) {
+                workbooks[branchCode] = XLSX.utils.book_new();
+            }
+
+            // Create array with headers and branch data
+            const branchArray = [
+                dataArray[0],  // Headers
+                dataArray[i]   // Branch specific data
+            ];
+
+            // Convert array to sheet
+            const worksheet = XLSX.utils.aoa_to_sheet(branchArray);
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(workbooks[branchCode], worksheet, name);
+        }
+    }
+}
+
+function detailedreport(name, dataArray) {
+    // Create a map to store arrays for each branch
+    const branchArrays = {};
+
+    // Initialize arrays for all allowed branches with headers
+    ALLOWED_BRANCHES.forEach(branch => {
+        branchArrays[branch] = [dataArray[0]];
+    });
+
+    // Process data rows
+    for (let i = 1; i < dataArray.length; i++) {
+        for (let j = 0; j < dataArray[i].length; j++) {
+            const value = dataArray[i][j];
+            // Check if the value is in our allowed branches
+            if (ALLOWED_BRANCHES.includes(value)) {
+                branchArrays[value].push(dataArray[i]);
+                break;
+            }
+        }
+    }
+
+    // Convert arrays to sheets and add to workbooks
+    ALLOWED_BRANCHES.forEach(branchCode => {
+        // Only create sheets for branches that have data
+        if (branchArrays[branchCode].length > 1) { // More than just headers
+            // Convert array to sheet
+            const worksheet = XLSX.utils.aoa_to_sheet(branchArrays[branchCode]);
+
+            // Create workbook if it doesn't exist
+            if (!workbooks[branchCode]) {
+                workbooks[branchCode] = XLSX.utils.book_new();
+            }
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(workbooks[branchCode], worksheet, name);
+        }
+    });
+}
+const dispatched = [15, 15, 17, 70, 87, 40, 30, 85, 76, 25, 10, 10, 45, 13, 25, 45, 85, 5, 18, 4, 27];
+const today = new Date();
+const oneDayMilliseconds = 24 * 60 * 60 * 1000; // Number of milliseconds in one day
+const oneDayBefore = new Date(today.getTime() - oneDayMilliseconds);
+
+const year = oneDayBefore.getFullYear();
+const month = String(oneDayBefore.getMonth() + 1).padStart(2, "0");
+const day = String(oneDayBefore.getDate()).padStart(2, "0");
+
+const firstDate = ` ${year}-${month}-01`;
+const current_date = `${year}-${month}-${day}`;
+// const current_date = `2025-05-09`;
+const dateDifference = new Date(current_date).getDate() + 1 - new Date(firstDate).getDate();
+// console.log(current_date);
+
+
+function findUniqueValues(arr) {
+    // Create a Set to store unique values
+    const uniqueSet = new Set();
+
+    // Iterate through the array and add each element to the Set
+    for (const element of arr) {
+        uniqueSet.add(element);
+    }
+
+    // Convert the Set back to an array (if needed)
+    const uniqueArray = [...uniqueSet];
+
+    return uniqueArray;
+}
+
+async function dailySummaryReport() {
+    // console.log("\n");
+    // console.log("===============================================");
+    // console.log("       DAILY SUMMARY REPORT MAKING START       ");
+    // console.log("===============================================");
+
+    let runtimeCount = 0;
+    let percentageActiveDevices = 0;
+    let activeDevicesCount = [];
+    let runtimeInHours = 0;
+    let totalDevices = 0;
+    let totalActiveDevices = 0
+    let sumProductAverageRuntimeTemp = 0;
+    let sumProductAverageRuntime = 0;
+    let totaldispatched = 0
+    const dataArray = [[
+        'Branch', 'Total Devices', 'Active Devices', 'Inactive Devices', '% Active Devices', 'Average Runtime', 'Optimal Runtime', 'Runtime Efficacy', "Dispatched Device"
+    ]];
+    let dim = [];
+    let branchArray = [];
+
+    //getting all branch
+    workbookData['All Device'].forEach(excelBranchElement => {
+        branchArray.push(excelBranchElement[CONSTANTS.BRANCH]);
+    });
+
+    // filter unqiue branch
+    branchArray = findUniqueValues(branchArray);
+
+    branchArray.forEach((element, index) => {
+        const filteredbranch = workbookData['All Device'].filter(d => d[CONSTANTS.BRANCH] === element); //filter excel row acc. to brancharray 
+
+        filteredbranch.forEach(deviceIdElement => {
+            const deviceInDatabase = response1.find(d => d.display_name === deviceIdElement[CONSTANTS.TECHWORKS_ID]);
+
+            if (deviceInDatabase?.display_count !== undefined) {
+                runtimeCount += Number(deviceInDatabase?.display_count);
+            }
+
+            if (deviceInDatabase?.display_count > 0) {
+                activeDevicesCount.push(deviceInDatabase);
+            }
+        });
+
+        percentageActiveDevices = Math.round((Number(activeDevicesCount.length) / Number(filteredbranch.length)) * 100);
+        if (!isFinite(percentageActiveDevices) || isNaN(percentageActiveDevices)) {
+            percentageActiveDevices = 0;
+        }
+
+        runtimeInHours = ((runtimeCount * 15) / 60) / filteredbranch.length;
+        if (!isFinite(runtimeInHours) || isNaN(runtimeInHours)) {
+            runtimeInHours = 0;
+        }
+
+
+        dim.push(element);
+        dim.push(filteredbranch.length);
+        dim.push(activeDevicesCount.length);
+        dim.push(Number(filteredbranch.length) - Number(activeDevicesCount.length));
+        dim.push(percentageActiveDevices + "%");
+        dim.push(runtimeInHours.toFixed(2));
+        dim.push(8);
+        dim.push(((runtimeInHours / 8) * 100).toFixed(2) + "%")
+        dim.push(dispatched[index])
+        dataArray.push(dim);
+
+        // reset all vaiables
+        dim = []
+        activeDevicesCount = [];
+        percentageActiveDevices = 0;
+        runtimeCount = 0;
+    });
+    for (let i = 1; i < dataArray.length; i++) {
+        const element = dataArray[i];
+        totalDevices += element[1];
+        totalActiveDevices += element[2];
+        sumProductAverageRuntimeTemp = Number(element[5] * element[2]);
+        sumProductAverageRuntime += sumProductAverageRuntimeTemp;
+        totaldispatched += element[8]
+    }
+
+    dim.push("Total");
+    dim.push(totalDevices);
+    dim.push(totalActiveDevices);
+    dim.push(totalDevices - totalActiveDevices);
+    dim.push(Math.round((totalActiveDevices / totalDevices) * 100) + "%");
+    dim.push((sumProductAverageRuntime / totalActiveDevices).toFixed(2))
+    dim.push(8);
+    dim.push(((((Math.trunc(sumProductAverageRuntime / totalActiveDevices)) / 8) * 100)).toFixed(2) + "%");
+    dim.push(`${totaldispatched}+3(Miscellaneous)=750`)
+    dataArray.push(dim);
+
+    const array_to_sheet = XLSX.utils.aoa_to_sheet(dataArray);
+    XLSX.utils.book_append_sheet(workbook, array_to_sheet, 'Daily Summary Report');
+    common('Daily Summary Report', dataArray);
+}
+
+async function mtdSummaryReport() {
+    // console.log("\n");
+    // console.log("===============================================");
+    // console.log("        MTD SUMMARY REPORT MAKING START        ");
+    // console.log("===============================================");
+
+    let runtimeCount = 0;
+    let percentageActiveDevices = 0;
+    let activeDevicesCount = [];
+    let runtimeInHours = 0;
+    let totalDevices = 0;
+    let totalActiveDevices = 0
+    let sumProductAverageRuntimeTemp = 0;
+    let sumProductAverageRuntime = 0;
+    let poorcount = 0
+    let goodcount = 0
+    let verygoodcount = 0
+    let criticalcount = 0
+    let totalcriticalcount = 0
+    let totalpoorcount = 0
+    let totalgoodcount = 0
+    let totalverygoodcount = 0
+    let totaldispatched = 0
+    const dataArray = [[
+        'Branch', 'Total Devices', 'Active Devices', 'Inactive Devices', '% Active Devices', 'Average Runtime', 'Optimal Runtime', 'Runtime Efficacy', "Critical", "Poor", "Good", "Very Good", "Dispatched Device"
+    ]];
+
+    function cal(activedays, averageDailyRuntime, operationDays) {
+        let cummalativescore = 0;
+
+        t1 = (activedays / operationDays) * 10
+        if (Math.floor(averageDailyRuntime / 8 * 10) > 10) {
+            t2 = 10;
+        } else {
+            t2 = Math.floor(averageDailyRuntime / 8 * 10);
+        }
+        cummalativescore = Math.ceil(t1 + t2);
+        if (cummalativescore >= 17 && cummalativescore <= 20) {
+            // cummalativerating = 'Very Good'
+            verygoodcount++
+        } else if (cummalativescore >= 12 && cummalativescore <= 16) {
+            // cummalativerating = 'Good'
+            goodcount++
+        } else if (cummalativescore >= 7 && cummalativescore <= 11) {
+            // cummalativerating = 'Poor'
+            poorcount++
+        } else if (cummalativescore < 7) {
+
+            criticalcount++
+        }
+    }
+    let dim = [];
+    let branchArray = [];
+
+    workbookData['All Device'].forEach(excelBranchElement => {
+        branchArray.push(excelBranchElement[CONSTANTS.BRANCH]);
+    });
+    branchArray = findUniqueValues(branchArray);
+
+    branchArray.forEach((element, index) => {
+        const filteredbranch = workbookData['All Device'].filter(d => d[CONSTANTS.BRANCH] === element);
+
+        filteredbranch.forEach(deviceIdElement => {
+            const deviceInDatabase = response2.find(d => d.display_name == deviceIdElement[CONSTANTS.TECHWORKS_ID] && d.display_count > 0);
+
+            if (deviceInDatabase !== undefined) {
+                activeDevicesCount.push(deviceInDatabase);
+            }
+        });
+
+        filteredbranch.forEach(deviceIdElement => {
+            const deviceInDatabase = response2.filter(d => d.display_name == deviceIdElement[CONSTANTS.TECHWORKS_ID]);
+
+            let operationDays = dateDifference
+            let activedays = 0
+            let runtimeAddition = 0
+            for (let index = 0; index < deviceInDatabase.length; index++) {
+                if (Number(deviceInDatabase[index].display_count) > 0) {
+                    activedays++
+                    runtimeAddition += Number(deviceInDatabase[index].display_count)
+                }
+            }
+            let averageDailyRuntime = ((Number(runtimeAddition) / 4) / operationDays)
+            cal(activedays, averageDailyRuntime, operationDays)
+
+            deviceInDatabase.forEach(dbElement => {
+                if (dbElement !== undefined) {
+                    runtimeCount += Number(dbElement.display_count)
+                }
+            });
+
+        });
+
+        percentageActiveDevices = Math.round((Number(activeDevicesCount.length) / Number(filteredbranch.length)) * 100);
+        if (!isFinite(percentageActiveDevices) || isNaN(percentageActiveDevices)) {
+            percentageActiveDevices = 0;
+        }
+        runtimeInHours = ((runtimeCount * 15) / 60) / filteredbranch.length;
+
+        if (!isFinite(runtimeInHours) || isNaN(runtimeInHours)) {
+            runtimeInHours = 0;
+        }
+
+        dim.push(element);
+        dim.push(filteredbranch.length);
+        dim.push(activeDevicesCount.length);
+        dim.push(Number(filteredbranch.length) - Number(activeDevicesCount.length));
+        dim.push(percentageActiveDevices + "%");
+        dim.push((runtimeInHours / dateDifference).toFixed(2));
+        dim.push(8);
+        dim.push((((runtimeInHours / dateDifference) / 8) * 100).toFixed(2) + "%")
+        dim.push(criticalcount)
+        dim.push(poorcount)
+        dim.push(goodcount)
+        dim.push(verygoodcount)
+        dim.push(dispatched[index])
+        dataArray.push(dim);
+
+        // reset all variables
+        dim = []
+        activeDevicesCount = [];
+        percentageActiveDevices = 0;
+        runtimeCount = 0;
+        criticalcount = 0
+        verygoodcount = 0
+        goodcount = 0
+        poorcount = 0
+
+    });
+    for (let i = 1; i < dataArray.length; i++) {
+        const element = dataArray[i];
+        totalDevices += element[1];
+        totalActiveDevices += element[2];
+        sumProductAverageRuntimeTemp = Number(element[5] * element[2]);
+        sumProductAverageRuntime += sumProductAverageRuntimeTemp;
+        totalverygoodcount += element[8]
+        totalgoodcount += element[9]
+        totalpoorcount += element[10]
+        totalcriticalcount += element[11]
+        totaldispatched += element[12]
+    }
+    dim.push("Total");
+    dim.push(totalDevices);
+    dim.push(totalActiveDevices);
+    dim.push(totalDevices - totalActiveDevices);
+    dim.push(Math.round((totalActiveDevices / totalDevices) * 100) + "%");
+    dim.push((sumProductAverageRuntime / totalActiveDevices).toFixed(2))
+    dim.push(8);
+    dim.push(((((Math.trunc(sumProductAverageRuntime / totalActiveDevices)) / 8) * 100)).toFixed(2) + "%");
+    dim.push(totalverygoodcount)
+    dim.push(totalgoodcount)
+    dim.push(totalpoorcount)
+    dim.push(totalcriticalcount)
+    dim.push(`${totaldispatched}+3(Miscellaneous)=750`)
+    dataArray.push(dim);
+
+    const array_to_sheet = XLSX.utils.aoa_to_sheet(dataArray);
+    XLSX.utils.book_append_sheet(workbook, array_to_sheet, 'MTD Summary Report');
+    common('MTD Summary Report', dataArray)
+}
+
+async function dailyReportDetailed() {
+    // console.log("\n");
+    // console.log("===============================================");
+    // console.log("       DAILY DETAIL REPORT MAKING START        ");
+    // console.log("===============================================");
+
+    let city = '';
+    let language = '';
+    let outletName = '';
+    let outletAddress = ''
+    let outletContactNumber = ''
+    let branchCode = '';
+    let branchPoc = '';
+    let aeName = '';
+    let dateOfInspection = '';
+    const dataArray = [[
+        'Display Name', 'Date', 'City', 'Language', 'Outlet Name', 'Outlet Address', 'Outlet Contact Number', 'Branch Code', 'Branch POC', 'AE Name', 'Date Of Inspection', 'Runtime'
+    ]];
+    let dim = [];
+
+    workbookData['All Device'].forEach((element, index) => {
+        const idDataFromDatabase = response1.find(d => d.display_name.replace(/\s*(\(new\)|\t)\s*/gi, '') == element[CONSTANTS.TECHWORKS_ID]);
+
+        if (idDataFromDatabase === undefined) {
+            city = '';
+            language = ''
+            outletName = '';
+            outletAddress = '';
+            outletContactNumber = '';
+            branchCode = '';
+            branchPoc = '';
+            dateOfInspection = '';
+            aeName = '';
+        } else {
+            city = element[CONSTANTS.CITY];
+            language = element[CONSTANTS.LANGAUAGE];
+            outletName = element[CONSTANTS.OUTLET_NAME];
+            outletAddress = element[CONSTANTS.OUTLET_ADDRESS];
+            outletContactNumber = element[CONSTANTS.OUTLET_CONTACT_NUM];
+            branchCode = element[CONSTANTS.BRANCH];
+            branchPoc = element[CONSTANTS.BRANCH_POC_NAME];
+            dateOfInspection = element[CONSTANTS.DATE_OF_INSPECTION];
+            aeName = element[CONSTANTS.AE_NAME];
+        }
+
+
+        dim.push(idDataFromDatabase?.display_name);
+        dim.push((idDataFromDatabase?.custom_date)?.toString().substring(4, 15));
+        dim.push(city);
+        dim.push(language);
+        dim.push(outletName);
+        dim.push(outletAddress);
+        dim.push(outletContactNumber);
+        dim.push(branchCode);
+        dim.push(branchPoc);
+        dim.push(aeName);
+        dim.push(dateOfInspection);
+        dim.push(idDataFromDatabase?.display_count == 0 ? 0 : ((idDataFromDatabase?.display_count * 15) / 60).toFixed(2));
+        dataArray.push(dim);
+
+        // rest all variables
+        city = '';
+        language = ''
+        outletName = '';
+        outletAddress = '';
+        outletContactNumber = '';
+        branchCode = '';
+        branchPoc = '';
+        aeName = '';
+        dateOfInspection = '';
+        dim = [];
+    });
+
+
+    const array_to_sheet = XLSX.utils.aoa_to_sheet(dataArray);
+    XLSX.utils.book_append_sheet(workbook, array_to_sheet, 'Daily Detailed Report');
+    detailedreport('Daily Detailed Report', dataArray)
+}
+
+async function mtdReportDetailed() {
+    // console.log("\n");
+    // console.log("===============================================");
+    // console.log("        MTD REPORT DETAILED MAKING START       ");
+    // console.log("===============================================");
+
+    let runtime = 0;
+    let activeDays = 0;
+    let averageDailyRuntime = 0;
+    let metricEfficiency = 0;
+    let city = '';
+    let language = '';
+    let outletName = '';
+    let outletAddress = ''
+    let outletContactNumber = ''
+    let branchPoc = '';
+    let aeName = '';
+    let dateOfInspection = '';
+    let simcardnumber = '';
+    let simCardProvider = '';
+    let branchCode = '';
+    let bucket = '';
+    let percentageActiveDays = 0;
+    let isactive = 0;
+    let rundayscoring = 0
+    let timescore = 0
+    let t1 = 0
+    let t2 = 0
+    let cummalativescore;
+    let cummalativerating;
+    const dataArray = [[
+        'Display Name', 'Date', 'City', 'Language', 'Outlet Name', 'Outlet Address', 'Outlet Contact Number', 'Branch Code', 'Branch POC', 'AE Name', 'Date Of Inspection', 'Sim Card Number', 'Sim Card Provider', 'Operation Days', 'Active Days', '% Active Days', 'Total Runtime in Hrs', 'Average Daily Runtime', 'New Metric Efficiency', 'Bucket', 'Remarks', "Active", "Run Day Scoring", "Time score", "Run days Scoring (Max 10) No of days Active/ No of Total days in Month *10 Max Score", "Run Time Scoring (Max 10) Avg. No of Hour Active/ Avg. 8 Hours Run *10 Max Score", "Cummalative Score", "Cummalative Rating"
+    ]];
+    let dim = [];
+
+    workbookData['All Device'].forEach(element => {
+        const idDataFromDatabase = response2.filter(d => d.display_name.replace(/\s*(\(new\)|\t)\s*/gi, '') == element[CONSTANTS.TECHWORKS_ID]);
+        const checkDeviceActiveOrNot = response1.filter(d => d.display_name.replace(/\s*(\(new\)|\t)\s*/gi, '') == element[CONSTANTS.TECHWORKS_ID] && Number(d.display_count) > 0);
+
+        if (checkDeviceActiveOrNot.length > 0) {
+            isactive = 1;
+        } else {
+            isactive = 0;
+        }
+
+        idDataFromDatabase.forEach(deviceElement => {
+            runtime += Number(deviceElement.display_count);
+            if (Number(deviceElement.display_count) > 0) {
+                activeDays++
+            }
+        });
+        averageDailyRuntime = (runtime / 4) / dateDifference;
+
+        if (idDataFromDatabase === undefined) {
+            city = '';
+            language = ''
+            outletName = '';
+            outletAddress = '';
+            outletContactNumber = '';
+            branchCode = '';
+            branchPoc = '';
+            dateOfInspection = '';
+            simcardnumber = '';
+            simCardProvider = '';
+            aeName = '';
+        } else {
+            city = element[CONSTANTS.CITY];
+            language = element[CONSTANTS.LANGAUAGE];
+            outletName = element[CONSTANTS.OUTLET_NAME];
+            outletAddress = element[CONSTANTS.OUTLET_ADDRESS];
+            outletContactNumber = element[CONSTANTS.OUTLET_CONTACT_NUM];
+            branchCode = element[CONSTANTS.BRANCH];
+            branchPoc = element[CONSTANTS.BRANCH_POC_NAME];
+            dateOfInspection = element[CONSTANTS.DATE_OF_INSPECTION];
+            simcardnumber = element[CONSTANTS.SIM_CARD_NUM];
+            simCardProvider = element[CONSTANTS.SIM_CARD_PROVIDER];
+            aeName = element[CONSTANTS.AE_NAME];
+        }
+
+        metricEfficiency =
+            (activeDays / dateDifference) *
+            (averageDailyRuntime / 8) *
+            100;
+
+
+        if (Math.round(metricEfficiency) >= 80) {
+            bucket = "Above 80";
+        }
+        if (
+            Math.round(metricEfficiency) < 80 &&
+            Math.round(metricEfficiency) >= 50
+        ) {
+            bucket = "Below 80";
+        }
+        if (Math.round(metricEfficiency) < 50 && Math.round(metricEfficiency) > 0) {
+            bucket = "Below 50";
+        }
+        if (Math.round(metricEfficiency) === 0) {
+            bucket = "Zero";
+        }
+
+        percentageActiveDays = (activeDays / dateDifference) * 100
+
+        //remarks 
+        if (Math.round(percentageActiveDays) >= 80 && Math.round(averageDailyRuntime) >= 8) {
+            remarks = 'Outstanding'
+        } if ((Math.round(percentageActiveDays) >= 70 && Math.round(percentageActiveDays) < 80) && Math.round(averageDailyRuntime) >= 8) {
+            remarks = 'Good'
+        } if (Math.round(percentageActiveDays) <= 70 && Math.round(averageDailyRuntime) > 0) {
+            remarks = 'Average'
+        } if (Math.round(percentageActiveDays) > 70 && Math.round(averageDailyRuntime) < 8) {
+            remarks = 'Satisfactory'
+        } if (Math.round(percentageActiveDays) <= 70 && Math.round(averageDailyRuntime) === 0) {
+            remarks = 'Poor'
+        }
+
+        let operationDays = dateDifference
+        timescore = averageDailyRuntime / 8
+        rundayscoring = (activeDays / operationDays)
+        t1 = (activeDays / operationDays) * 10
+        if (Math.floor(averageDailyRuntime / 8 * 10) > 10) {
+            t2 = 10
+        } else {
+            t2 = Math.floor(averageDailyRuntime / 8 * 10)
+        }
+        cummalativescore = Math.floor(t1 + t2)
+
+        if (cummalativescore >= 17 && cummalativescore <= 20) {
+            cummalativerating = 'Very Good'
+        } else if (cummalativescore >= 12 && cummalativescore <= 16) {
+            cummalativerating = 'Good'
+        } else if (cummalativescore >= 7 && cummalativescore <= 11) {
+            cummalativerating = 'Poor'
+        } else if (cummalativescore < 7) {
+            cummalativerating = 'Critical'
+        }
+
+        dim.push(idDataFromDatabase[0]?.display_name);
+        dim.push(current_date);
+        dim.push(city);
+        dim.push(language);
+        dim.push(outletName);
+        dim.push(outletAddress);
+        dim.push(outletContactNumber);
+        dim.push(branchCode);
+        dim.push(branchPoc);
+        dim.push(aeName);
+        dim.push(dateOfInspection);
+        dim.push(simcardnumber);
+        dim.push(simCardProvider);
+        dim.push(dateDifference);
+        dim.push(activeDays);
+        dim.push(((activeDays / dateDifference) * 100).toFixed(2) + "%");
+        dim.push(runtime / 4);   //   15min/60
+        dim.push(averageDailyRuntime.toFixed(2)); //average daily runtime
+        dim.push(metricEfficiency.toFixed(2) + "%");
+        dim.push(bucket);
+        dim.push(remarks);
+        dim.push(isactive)
+        dim.push((rundayscoring * 100).toFixed(2) + '%')
+        dim.push((timescore * 100).toFixed(2) + '%')
+        dim.push(t1.toFixed(2))
+        dim.push(t2)
+        dim.push(cummalativescore)
+        dim.push(cummalativerating)
+        dataArray.push(dim)
+
+        // reset all variables
+        activeDays = 0;
+        runtime = 0;
+        averageDailyRuntime = 0;
+        metricEfficiency = 0;
+        percentageActiveDays = 0;
+        city = '';
+        language = '';
+        outletName = '';
+        outletAddress = '';
+        outletContactNumber = '';
+        branchCode = '';
+        branchPoc = '';
+        aeName = '';
+        dateOfInspection = '';
+        simcardnumber = '';
+        simCardProvider = '';
+        bucket = ''
+        remarks = '';
+        isactive = 0;
+        rundayscoring = 0
+        timescore = 0
+        t1 = 0
+        t2 = 0
+        cummalativescore = 0
+        cummalativerating = null
+        dim = [];
+    });
+
+
+    const array_to_sheet = XLSX.utils.aoa_to_sheet(dataArray);
+    XLSX.utils.book_append_sheet(workbook, array_to_sheet, 'MTD Detailed Report');
+    detailedreport('MTD Detailed Report', dataArray)
+}
+
+// Add function to get file path
+function getFilePath(filename) {
+    return path.join(__dirname, filename);
+}
+
+// Modify the part where files are saved
+Promise.all([querydb()])
+    .then(() => {
+        Promise.all([
+            dailySummaryReport(),
+            mtdSummaryReport(),
+            dailyReportDetailed(),
+            mtdReportDetailed(),
+            // performanceReport(),
+            // mtdRemarksReport()
+        ])
+            .then(() => {
+                setTimeout(() => {
+                    // Write main workbook with proper path
+                    const fileName = 'MPDU REPORT TILL' + current_date + '.xlsx';
+                    const mainFilePath = getFilePath(fileName);
+                    XLSX.writeFile(workbook, mainFilePath);
+
+                    // Write individual branch workbooks with proper paths
+                    Object.entries(workbooks).forEach(([branchCode, workbook]) => {
+                        const branchFileName = `MPDU REPORT TILL ${branchCode}${current_date}.xlsx`;
+                        const branchFilePath = getFilePath(branchFileName);
+                        XLSX.writeFile(workbook, branchFilePath);
+                    });
+                }, 3000);
+
+                setTimeout(() => {
+                    sendReports();
+                }, 10000);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+            })
+    });
+
+// Modify sendBranchReport function to use proper file paths
+async function sendBranchReport(branch = null) {
+    try {
+        const config = branch ? EMAIL_CONFIG[branch] || EMAIL_CONFIG.DEFAULT : EMAIL_CONFIG.DEFAULT;
+
+        let currentTransporter;
+        switch (config.transporterName) {
+            case 'transporter1':
+                currentTransporter = transporter1;
+                break;
+            case 'transporter2':
+                currentTransporter = transporter2;
+                break;
+            case 'transporter3':
+                currentTransporter = transporter3;
+                break;
+            case 'transporter4':
+                currentTransporter = transporter4;
+                break;
+            default:
+                currentTransporter = transporter1;
+        }
+
+        const attachments = [];
+
+        if (!branch || config === EMAIL_CONFIG.DEFAULT) {
+            // Add main report with proper path
+            const mainFileName = `MPDU REPORT TILL${current_date}.xlsx`;
+            attachments.push({
+                filename: mainFileName,
+                path: getFilePath(mainFileName)
+            });
+
+            // Add all branch reports with proper paths
+            ALLOWED_BRANCHES.forEach(branchCode => {
+                const branchFileName = `MPDU REPORT TILL ${branchCode}${current_date}.xlsx`;
+                attachments.push({
+                    filename: branchFileName,
+                    path: getFilePath(branchFileName)
+                });
+            });
+        } else {
+            // For specific branch, only include that branch's report with proper path
+            const branchFileName = `MPDU REPORT TILL ${branch}${current_date}.xlsx`;
+            attachments.push({
+                filename: branchFileName,
+                path: getFilePath(branchFileName)
+            });
+        }
+
+        const info = await currentTransporter.sendMail({
+            from: 'reports@techworks.co.in',
+            // to: 'hitesh.kumar@techworks.co.in',
+            cc: config.cc,
+            to: config.to,
+            subject: config.subject + current_date,
+            html: `<h6>Please find the attached MPDU report.</h6>`,
+            attachments: attachments
+        });
+
+        console.log("\n");
+        console.log("===============================================");
+        console.log(`     MAIL SENT SUCCESSFULLY ${branch || 'ALL'}     `);
+        console.log("===============================================");
+
+        return info;
+    } catch (error) {
+        console.error(`Error sending email for ${branch || 'ALL'}:`, error);
+        throw error;
+    }
+}
+
+async function sendReports() {
+    try {
+        console.log("\n");
+        console.log("===============================================");
+        console.log("              STARTING REPORT DELIVERY         ");
+        console.log("===============================================");
+
+        // Send main report with all branches
+        await sendBranchReport();
+
+        // Group branches by transporter
+        const transporterGroups = {
+            transporter1: [],
+            transporter2: [],
+            transporter3: [],
+            transporter4: []
+        };
+
+        // Sort branches into transporter groups
+        ALLOWED_BRANCHES.forEach(branch => {
+            const config = EMAIL_CONFIG[branch];
+            if (config && config.transporterName) {
+                transporterGroups[config.transporterName].push(branch);
+            }
+        });
+
+        // Send reports for each transporter group sequentially
+        for (const [transporter, branches] of Object.entries(transporterGroups)) {
+            console.log(`\nSending emails for ${transporter}...`);
+
+            for (const branch of branches) {
+                try {
+                    await sendBranchReport(branch);
+                    // Add a small delay between emails to prevent rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                } catch (error) {
+                    console.error(`Failed to send report for ${branch}:`, error);
+                    continue;
+                }
+            }
+        }
+
+        console.log("\n");
+        console.log("===============================================");
+        console.log("           ALL REPORTS SENT SUCCESSFULLY       ");
+        console.log("===============================================");
+    } catch (error) {
+        console.error("Error in sendReports:", error);
+        throw error;
+    }
+}
