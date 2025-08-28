@@ -8,10 +8,6 @@ const { getCredentialsPath } = require('../../utility/pathUtils');
 
 let accountList = [
     {
-        "user": "chirag.p@techworks.co.in",
-        "pass": "Byzzy1-jucton-gogkeq"
-    },
-    {
         "user": "Bharti.singh@techworks.co.in",
         "pass": "gymruc-saKpu8-purnoc"
     },
@@ -26,8 +22,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: accountList[0].user,
-        pass: accountList[0].pass
+        user: accountList[1].user,
+        pass: accountList[1].pass
     }
 });
 
@@ -195,9 +191,9 @@ async function reportDelivery(i, toEmails, ccEmails) {
         // send mail with defined transport object
         const info = await transporter.sendMail({
             from: fromEmail,
-            // to: 'hitesh.kumar@techworks.co.in',
-            to: toEmails,
-            cc: ccEmails,
+            to: 'hitesh.kumar@techworks.co.in',
+            // to: toEmails,
+            // cc: ccEmails,
             subject: `ITC TAB COMPLAINT TRACKER ${i?.Branch} ${currentFormattedDate}`, // Subject line
             html: `<h6>Please find the attachment.</h6>
             <p>&nbsp;</p>
@@ -295,9 +291,9 @@ async function reportDelivery(i, toEmails, ccEmails) {
                     </tbody>
             </table>`,
             attachments: [
-                {   // file on disk as an attachment
+                {
                     filename: i?.fileName,
-                    path: `./reports/${i?.fileName}` // stream this file
+                    path: path.join(__dirname, 'reports', i?.fileName) // ✅ safer absolute path
                 }
             ]
         });
