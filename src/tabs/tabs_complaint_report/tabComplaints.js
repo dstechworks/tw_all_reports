@@ -191,9 +191,9 @@ async function reportDelivery(i, toEmails, ccEmails) {
         // send mail with defined transport object
         const info = await transporter.sendMail({
             from: fromEmail,
-            to: 'hitesh.kumar@techworks.co.in',
-            // to: toEmails,
-            // cc: ccEmails,
+            // to: 'hitesh.kumar@techworks.co.in',
+            to: toEmails,
+            cc: ccEmails,
             subject: `ITC TAB COMPLAINT TRACKER ${i?.Branch} ${currentFormattedDate}`, // Subject line
             html: `<h6>Please find the attachment.</h6>
             <p>&nbsp;</p>
