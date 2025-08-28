@@ -3,8 +3,10 @@ const { google } = require('googleapis');
 const { Pool } = require('pg');
 const XLSX = require('xlsx');
 const path = require('path');
+const fs = require('fs');
 
-const CONSTANTS = require("./constants");
+const CONSTANTS = require("./constants.js");
+const { getCredentialsPath } = require("../../utility/pathUtils.js");
 
 let accountList = [
     {
@@ -264,7 +266,7 @@ async function getDataFromGoogleSheets(sheetID, reference) {
         try {
             // Initialize the authentication client
             const auth = new google.auth.GoogleAuth({
-                keyFile: "/root/mpdu-daily-report/credentials.json",
+                keyFile: getCredentialsPath(),
                 scopes: ["https://www.googleapis.com/auth/spreadsheets"],
             });
 
@@ -987,9 +989,16 @@ async function mtdReportDetailed() {
     detailedreport('MTD Detailed Report', dataArray)
 }
 
-// Add function to get file path
+// Add function to get file path for reports folder
 function getFilePath(filename) {
-    return path.join(__dirname, filename);
+    const reportsDir = path.join(__dirname, 'reports');
+    
+    // Ensure reports directory exists
+    if (!fs.existsSync(reportsDir)) {
+        fs.mkdirSync(reportsDir, { recursive: true });
+    }
+    
+    return path.join(reportsDir, filename);
 }
 
 // Modify the part where files are saved
@@ -999,9 +1008,7 @@ Promise.all([querydb()])
             dailySummaryReport(),
             mtdSummaryReport(),
             dailyReportDetailed(),
-            mtdReportDetailed(),
-            // performanceReport(),
-            // mtdRemarksReport()
+            mtdReportDetailed()
         ])
             .then(() => {
                 setTimeout(() => {
@@ -1009,18 +1016,24 @@ Promise.all([querydb()])
                     const fileName = 'MPDU REPORT TILL' + current_date + '.xlsx';
                     const mainFilePath = getFilePath(fileName);
                     XLSX.writeFile(workbook, mainFilePath);
+                    console.log(`Main report saved: ${mainFilePath}`);
 
                     // Write individual branch workbooks with proper paths
                     Object.entries(workbooks).forEach(([branchCode, workbook]) => {
                         const branchFileName = `MPDU REPORT TILL ${branchCode}${current_date}.xlsx`;
                         const branchFilePath = getFilePath(branchFileName);
                         XLSX.writeFile(workbook, branchFilePath);
+                        console.log(`Branch report saved: ${branchFilePath}`);
                     });
+                    
+                    console.log("\n===============================================");
+                    console.log("           ALL REPORTS SAVED SUCCESSFULLY       ");
+                    console.log("===============================================");
                 }, 3000);
 
-                setTimeout(() => {
-                    sendReports();
-                }, 10000);
+                // setTimeout(() => {
+                //     sendReports();
+                // }, 10000);
             })
             .catch((error) => {
                 console.error("An error occurred:", error);
