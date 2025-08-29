@@ -1,4 +1,3 @@
-
 const { exec } = require('child_process');
 const moment = require('moment-timezone');
 const cron = require('node-cron');
@@ -26,22 +25,25 @@ function runScript(name, path) {
     });
 }
 
-// Every Monday @ 11:58 AM: Run MPDU Complaints
+// ✅ Every Monday @ 11:58 AM
 cron.schedule('58 11 * * 1', () => {
-    runScript('MPDU Complaints', 'src/mpdu/mpdu_43vertical_complaint_report/mpduComplaints.js'); // Monday 11:58 AM
+    runScript('MPDU Complaints', 'src/mpdu/mpdu_43vertical_complaint_report/mpduComplaints.js');
 }, { timezone: TIMEZONE });
 
-// 15th day of month and last day of month @ 12:00 PM: Run Tab Complaints
+// ✅ 15th day of month @ 12:00 PM
 cron.schedule('0 12 15 * *', () => {
-    runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js'); // 15th day of month at 12 PM
+    runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js');
 }, { timezone: TIMEZONE });
 
-// Last day of month @ 12:00 PM: Run Tab Complaints
+// ✅ Last day of month @ 12:00 PM
 cron.schedule('0 12 28-31 * *', () => {
     const now = moment().tz(TIMEZONE);
-    const lastDayOfMonth = now.endOf('month').date();
+    const lastDayOfMonth = now.clone().endOf('month').date();
+
     if (now.date() === lastDayOfMonth) {
-        runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js'); // Last day of month at 12 PM
+        runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js');
+    } else {
+        logWithTime(`Not last day (${now.format("YYYY-MM-DD")}), skipping...`);
     }
 }, { timezone: TIMEZONE });
 
@@ -50,3 +52,6 @@ cron.schedule('0 12 28-31 * *', () => {
 // runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/mpdu.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/43vertical.js');
+
+
+console.log(`Script Started At ${moment().tz(TIMEZONE).format("YYYY-MM-DD HH:mm:ss")}`);

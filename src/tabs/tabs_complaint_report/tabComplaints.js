@@ -163,7 +163,7 @@ const sendMail = async () => {
         for (let idx = 0; idx < workbookData['POC_LIST'].length; idx++) {
             const i = workbookData['POC_LIST'][idx];
             let branchName = i?.Branch;
-            let emailCCSectionFromBaseSheet = i['Emails (For CC Section)']
+            let emailCCSectionFromBaseSheet = i['Emails (For CC Section)'];
             let ccEmails = emailCCSectionFromBaseSheet ? `${emailCCSectionFromBaseSheet}, ${mailsForCC}` : mailsForCC;
             let toEmails = i['Emails (For To Section)'];
 
