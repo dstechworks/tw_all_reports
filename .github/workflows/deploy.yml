@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - production  # 🔁 Change to your deployment branch if needed
+      - production  # 🔁 Trigger only when code is pushed to production branch
 
 jobs:
   deploy:
@@ -18,8 +18,16 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 143.110.188.148 >> ~/.ssh/known_hosts  # 🔁 Replace IP
+          ssh-keyscan -H 143.110.188.148 >> ~/.ssh/known_hosts  # 🔁 Replace with your server IP
+
+      - name: Deploy code to server
+        run: |
+          rsync -avz --delete \
+            --exclude=node_modules \
+            --exclude=.git \
+            -e "ssh -i ~/.ssh/id_ed25519" \
+            ./ root@143.110.188.148:/root/tw_all_reports
 
       - name: Run Deploy Script on Server
         run: |
-          ssh root@143.110.188.148 'bash -s' < ./deploy.sh  # 🔁 Replace user, IP, and script path
+          ssh -i ~/.ssh/id_ed25519 root@143.110.188.148 "bash /root/tw_all_reports/deploy.sh"
