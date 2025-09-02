@@ -9,8 +9,8 @@ function getCredentialsPath() {
     // Get the directory of the current script
     const currentScriptDir = __dirname;
     
-    // Navigate to the project root from the utility directory (2 levels up)
-    const projectRoot = path.resolve(currentScriptDir, '../..');
+    // Navigate to the project root from the utility directory (3 levels up)
+    const projectRoot = path.resolve(currentScriptDir, '../../..');
     
     // Return the path to credentials.json in the project root
     return path.join(projectRoot, 'credentials.json');
