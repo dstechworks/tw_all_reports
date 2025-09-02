@@ -9,7 +9,8 @@
     "3": "node src/mpdu/mpdu_43vertical_month_end_report/mpdu.js",
     "4": "node src/mpdu/mpdu_43vertical_month_end_report/43vertical.js",
     "5": "node src/mpdu/mpdu_daily_report/mpdu.js",
-    "6": "node src/mpdu/mpdu_daily_report/43vertical.js"
+    "6": "node src/mpdu/mpdu_daily_report/43vertical.js",
+    "7": "node src/latLngNetworkAddInAllReports/index.js"
   },
   "keywords": [],
   "author": "",
