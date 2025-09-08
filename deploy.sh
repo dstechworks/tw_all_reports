@@ -22,10 +22,10 @@ rm -rf node_modules >> /tmp/deploy.log 2>&1
 echo "Installing dependencies..." >> /tmp/deploy.log
 npm install >> /tmp/deploy.log 2>&1
 
-# Restart the app with PM2 (process ID 7)
-echo "Restarting app with PM2 (ID 7)..." >> /tmp/deploy.log
-pm2 stop 7 >> /tmp/deploy.log 2>&1
-pm2 restart 7 >> /tmp/deploy.log 2>&1
+# Restart the app with PM2 (process ID 6)
+echo "Restarting app with PM2 (ID 6)..." >> /tmp/deploy.log
+pm2 stop 6 >> /tmp/deploy.log 2>&1
+pm2 restart 6 >> /tmp/deploy.log 2>&1
 pm2 save >> /tmp/deploy.log 2>&1
 
 echo "===== DEPLOY COMPLETED at $(date) =====" >> /tmp/deploy.log
