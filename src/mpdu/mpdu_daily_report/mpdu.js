@@ -120,14 +120,14 @@ const EMAIL_CONFIG = {
         emailCount: 7
     },
     'EORI': {
-        to: "Bibek.Swain@itc.in,DeepakKumar.Swain@itc.in",
+        to: "debasis.mohanty@itc.in",
         cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
         subject: "EORI MPDU REPORT TILL",
         transporterName: "transporter1",
         emailCount: 7
     },
     'EVIZ': {
-        to: "Mubhashira.Mohammad@itc.in",
+        to: "Umamaheshwariharini.Podagatlapalli@itc.in",
         cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
         subject: "EVIZ MPDU REPORT TILL",
         transporterName: "transporter1",
