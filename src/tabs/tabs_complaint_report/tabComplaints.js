@@ -17,22 +17,27 @@ let accountList = [
     },
 ]
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.dreamhost.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: accountList[1].user,
-        pass: accountList[1].pass
-    }
-});
+// Create transporter function to get transporter for specific account
+const createTransporter = (accountIndex) => {
+    return nodemailer.createTransport({
+        host: "smtp.dreamhost.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: accountList[accountIndex].user,
+            pass: accountList[accountIndex].pass
+        }
+    });
+};
 
 // Google Sheet ID
 const spreadsheetId = "1MeBsVwqq-ZQlBO3tFK68ZUyDz1Uud1iQlrLl7vvXVb4";
 // Get the current date in Asia/Kolkata timezone
 const currentDate = moment().tz("Asia/Kolkata").toDate();
 const currentFormattedDate = moment(currentDate).format('DD-MM-YYYY');
+// Batch1Arr will use accountList[0] (Bharti.singh@techworks.co.in)
 let Batch1Arr = ['NSAH', 'WNAG', 'SKAR', 'WPUN', 'WMUM', 'NCHA', 'ECAL', 'NJPR'];
+// Batch2Arr will use accountList[1] (hitesh.kumar@techworks.co.in)
 let Batch2Arr = ['WBHO', 'NDEL', 'WAHM', 'EPAT', 'NLUC', 'SHYD', 'SBLR'];
 let workbookData = {};
 let branchListOfArr = [];
@@ -160,6 +165,8 @@ const sendMail = async () => {
     if (workbookData['POC_LIST']) {
         console.log(`\n`);
 
+        // Process Batch1Arr with accountList[0]
+        console.log(`================Processing Batch1Arr with accountList[0]================`);
         for (let idx = 0; idx < workbookData['POC_LIST'].length; idx++) {
             const i = workbookData['POC_LIST'][idx];
             let branchName = i?.Branch;
@@ -167,15 +174,31 @@ const sendMail = async () => {
             let ccEmails = emailCCSectionFromBaseSheet ? `${emailCCSectionFromBaseSheet}, ${mailsForCC}` : mailsForCC;
             let toEmails = i['Emails (For To Section)'];
 
-            // console.log(`TO MAILS :- ${toEmails} CC MAILS :- ${ccEmails}`);
-            // console.log(mailsForCC);
-
-
             if (Batch1Arr.includes(branchName)) {
-                console.log(`================Processing Branch: (${branchName})================`);
+                console.log(`================Processing Branch: (${branchName}) with accountList[0]================`);
 
                 // Ensure that each reportDelivery finishes before moving to the next
-                await reportDelivery(i, toEmails, ccEmails);
+                await reportDelivery(i, toEmails, ccEmails, 0); // 0 for accountList[0]
+                console.log(`============Finished processing Branch: (${branchName})============`);
+                console.log(`\n`);
+                await delay(5000);
+            }
+        }
+
+        // Process Batch2Arr with accountList[1]
+        console.log(`================Processing Batch2Arr with accountList[1]================`);
+        for (let idx = 0; idx < workbookData['POC_LIST'].length; idx++) {
+            const i = workbookData['POC_LIST'][idx];
+            let branchName = i?.Branch;
+            let emailCCSectionFromBaseSheet = i['Emails (For CC Section)'];
+            let ccEmails = emailCCSectionFromBaseSheet ? `${emailCCSectionFromBaseSheet}, ${mailsForCC}` : mailsForCC;
+            let toEmails = i['Emails (For To Section)'];
+
+            if (Batch2Arr.includes(branchName)) {
+                console.log(`================Processing Branch: (${branchName}) with accountList[1]================`);
+
+                // Ensure that each reportDelivery finishes before moving to the next
+                await reportDelivery(i, toEmails, ccEmails, 1); // 1 for accountList[1]
                 console.log(`============Finished processing Branch: (${branchName})============`);
                 console.log(`\n`);
                 await delay(5000);
@@ -184,8 +207,12 @@ const sendMail = async () => {
     }
 }
 
-async function reportDelivery(i, toEmails, ccEmails) {
+async function reportDelivery(i, toEmails, ccEmails, accountIndex) {
     let fromEmail = 'reports@techworks.co.in';
+
+    // Create transporter for the specific account
+    const transporter = createTransporter(accountIndex);
+    console.log(`Using account: ${accountList[accountIndex].user} for branch: ${i?.Branch}`);
 
     try {
         // send mail with defined transport object
