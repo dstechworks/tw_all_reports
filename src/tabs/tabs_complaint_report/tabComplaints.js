@@ -15,6 +15,14 @@ let accountList = [
         "user": "hitesh.kumar@techworks.co.in",
         "pass": "4VqvS&RY*ZFnqaU1"
     },
+    {
+        "user": "pratik@techworks.co.in",
+        "pass": "Ew^KvQkh"
+    },
+    {
+        "user": "rusum@techworks.co.in",
+        "pass": "E$4aFt6wEm36#AaK"
+    }
 ]
 
 // Create transporter function to get transporter for specific account
