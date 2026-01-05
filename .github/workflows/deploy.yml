@@ -23,9 +23,9 @@ jobs:
       - name: Deploy code to server
         run: |
           rsync -avz --delete \
+            --exclude=.env \
             --exclude=node_modules \
             --exclude=.git \
-            --exclude=.env.* \
             -e "ssh -i ~/.ssh/id_ed25519" \
             ./ root@143.110.188.148:/root/tw_all_reports
 
