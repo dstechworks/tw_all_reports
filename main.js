@@ -25,8 +25,8 @@ function runScript(name, path) {
     });
 }
 
-// ✅ Every day @ 10:00 AM
-cron.schedule('0 10 * * *', () => {
+// ✅ Every day @ 09:30 AM
+cron.schedule('30 9 * * *', () => {
     runScript('JSPL Raigarh', 'src/jspl/jspl_raigarh_screens_notification_report/jspl_raigarh.js');
 }, { timezone: TIMEZONE });
 
