@@ -10,13 +10,15 @@
     "4": "node src/mpdu/mpdu_43vertical_month_end_report/43vertical.js",
     "5": "node src/mpdu/mpdu_daily_report/mpdu.js",
     "6": "node src/mpdu/mpdu_daily_report/43vertical.js",
-    "7": "node src/latLngNetworkAddInAllReports/index.js"
+    "7": "node src/latLngNetworkAddInAllReports/index.js",
+    "8": "node src/jspl/jspl_raigarh_screens_notification_report/jspl_raigarh.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.11.0",
+    "dotenv": "^17.2.3",
     "googleapis": "^157.0.0",
     "moment-timezone": "^0.6.0",
     "node-cron": "^4.2.1",

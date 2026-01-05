@@ -131,6 +131,7 @@ dist
 src/mpdu/mpdu_43vertical_month_end_report/reports
 src/mpdu/mpdu_43vertical_complaint_report/reports
 src/tabs/tabs_complaint_report/reports
+src/jspl/jspl_raigarh_screens_notification_report/reports
 
 # logs folder
 src/mpdu/mpdu_43vertical_month_end_report/logs

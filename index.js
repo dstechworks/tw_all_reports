@@ -25,6 +25,11 @@ function runScript(name, path) {
     });
 }
 
+// ✅ Every day @ 10:00 AM
+cron.schedule('0 10 * * *', () => {
+    runScript('JSPL Raigarh', 'src/jspl/jspl_raigarh_screens_notification_report/jspl_raigarh.js');
+}, { timezone: TIMEZONE });
+
 // ✅ Every Monday @ 11:58 AM
 cron.schedule('58 11 * * 1', () => {
     runScript('MPDU Complaints', 'src/mpdu/mpdu_43vertical_complaint_report/mpduComplaints.js');
@@ -52,5 +57,6 @@ cron.schedule('0 12 28-31 * *', () => {
 // runScript('Tab Complaints', 'src/tabs/tabs_complaint_report/tabComplaints.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/mpdu.js');
 // runScript('MPDU 43 Vertical', 'src/mpdu/mpdu_43vertical_month_end_report/43vertical.js');
+// runScript('JSPL Raigarh', 'src/jspl/jspl_raigarh_screens_notification_report/jspl_raigarh.js');
 
 console.log(`Script Started At ${moment().tz(TIMEZONE).format("YYYY-MM-DD HH:mm:ss")}`);
