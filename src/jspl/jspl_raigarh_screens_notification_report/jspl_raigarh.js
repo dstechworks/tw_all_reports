@@ -15,6 +15,8 @@ const current_date = moment().tz(timezone).format('DD-MM-YYYY');
 
 // Email configuration
 const config = {
+    // to: "hitesh.kumar@techworks.co.in",
+    // cc: "",
     to: "balendu.patel@jindalsteel.in, vijay.das@jindalsteel.in",
     cc: "dhruv@techworks.co.in, sandip@techworks.co.in, rusum@techworks.co.in, hitesh.kumar@techworks.co.in",
     subject: "JSPL Raigarh Screens Notification Report - "
@@ -138,8 +140,10 @@ function generateExcelReport(data) {
 
         return {
             'displayId': item.displayId,
-            'Date': moment().tz(timezone).format('DD-MM-YYYY hh:mm A'),
+            'Report Generated On': moment().tz(timezone).format('DD-MM-YYYY hh:mm A'),
             'Display': item.display,
+            'Location': item.description,
+            'Last Accessed': item.lastAccessed ? moment(item.lastAccessed).tz(timezone).format('DD-MM-YYYY hh:mm A') : '',
             'Active/Inactive': status
         };
     });
