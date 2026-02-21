@@ -17,7 +17,7 @@ const current_date = moment().tz(timezone).format('DD-MM-YYYY');
 const config = {
     // to: "hitesh.kumar@techworks.co.in",
     // cc: "",
-    to: "balendu.patel@jindalsteel.in, vijay.das@jindalsteel.in",
+    to: "balendu.patel@jindalsteel.in, vijay.das@jindalsteel.in, itelec.rgh@jindalsteel.in",
     cc: "dhruv@techworks.co.in, sandip@techworks.co.in, rusum@techworks.co.in, hitesh.kumar@techworks.co.in",
     subject: "JSPL Raigarh Screens Notification Report - "
 };
