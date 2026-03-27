@@ -127,7 +127,7 @@ const EMAIL_CONFIG = {
         emailCount: 7
     },
     'EVIZ': {
-        to: "Umamaheshwariharini.Podagatlapalli@itc.in",
+        to: "Umamaheshwariharini.Podagatlapalli@itc.in,eswarp47@gmail.com",
         cc: "sumit.gupta@techworks.co.in, sandip@techworks.co.in, pratik@techworks.co.in, rusum@techworks.co.in",
         subject: "EVIZ MPDU REPORT TILL",
         transporterName: "transporter1",
